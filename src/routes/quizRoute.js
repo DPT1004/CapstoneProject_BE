@@ -6,6 +6,7 @@ const {
     getQuiz,
     getAllQuiz,
     getQuizByIdCreator,
+    getQuizesBySearch,
     updateQuiz,
     deleteQuiz,
     addQuestion,
@@ -17,6 +18,8 @@ router
     .route("/")
     .post(createQuiz)
     .get(getAllQuiz)
+
+router.get("/search", getQuizesBySearch)
 
 router
     .route("/:id")

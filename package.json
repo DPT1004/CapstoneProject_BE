@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "startSocket": "nodemon socketServer.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,7 +14,8 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.5"
+    "mongoose": "^7.0.5",
+    "socket.io": "^4.6.1"
   },
   "devDependencies": {
     "dotenv": "^16.0.3",

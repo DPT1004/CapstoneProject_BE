@@ -24,10 +24,12 @@ const createQuiz = async (req, res) => {
 
   try {
     const newQuiz = await quiz.save()
-    res.status(201).json(newQuiz)
+    res.json({ message: "Create Quiz success" })
   } catch (error) {
     res.status(400).json({ message: error.message })
+    console.log("error: ", error.message);
   }
+
 }
 
 const getQuiz = async (req, res) => {
@@ -44,9 +46,21 @@ const getQuiz = async (req, res) => {
 }
 
 const getAllQuiz = async (req, res) => {
+  const { page } = req.query
   try {
-    const quizes = await Quiz.find()
-    res.status(200).send(quizes)
+    const LIMIT = 5
+    const startIndex = (Number(page) - 1) * LIMIT
+
+    const total = await Quiz.find({ isPublic: true }).countDocuments()
+    const quizes = await Quiz.find({ isPublic: true })
+      .sort({ _id: -1 })
+      .limit(LIMIT)
+      .skip(startIndex)
+
+    res.status(200).send({
+      data: quizes,
+      numberOfPages: Math.ceil(total / LIMIT)
+    })
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -54,20 +68,46 @@ const getAllQuiz = async (req, res) => {
 
 const getQuizByIdCreator = async (req, res) => {
   const { creatorId } = req.params
-  console.log(creatorId)
+  const { page } = req.query
   try {
+    const LIMIT = 5
+    const startIndex = (Number(page) - 1) * LIMIT
+
+    const total = await Quiz.find({ creatorId: creatorId }).countDocuments()
     const quizes = await Quiz.find({ creatorId: creatorId })
+      .sort({ _id: -1 })
+      .limit(LIMIT)
+      .skip(startIndex)
+
+    res.status(200).send({
+      data: quizes,
+      numberOfPages: Math.ceil(total / LIMIT)
+    })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+const getQuizesBySearch = async (req, res) => {
+  const { nameQuiz, tags } = req.query
+  try {
+    const name = new RegExp(nameQuiz, "i")
+
+    const quizes = await Quiz.find({
+      isPublic: true,
+      $or: [{ name }, { tags: { $in: tags.split(",") } }],
+    })
 
     res.status(200).send(quizes)
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    res.status(404).json({ message: error.message })
   }
 }
 
 const updateQuiz = async (req, res) => {
   const { id } = req.params
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).send(`No quiz with id: ${id}`)
+    return res.status(404).json({ message: `No quiz with id: ${id}` })
   }
 
   const {
@@ -92,7 +132,7 @@ const updateQuiz = async (req, res) => {
   })
   try {
     const updatedQuiz = await Quiz.findByIdAndUpdate(id, quiz)
-    res.json(updatedQuiz)
+    res.json({ message: "Update quiz success" })
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
@@ -101,7 +141,7 @@ const updateQuiz = async (req, res) => {
 const deleteQuiz = async (req, res) => {
   const { id } = req.params
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).send(`No quiz with id: ${id}`)
+    return res.status(404).json({ message: `No quiz with id: ${id}` })
   }
 
   try {
@@ -214,6 +254,7 @@ module.exports = {
   getQuiz,
   getAllQuiz,
   getQuizByIdCreator,
+  getQuizesBySearch,
   updateQuiz,
   deleteQuiz,
   addQuestion,

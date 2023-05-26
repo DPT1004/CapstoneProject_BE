@@ -19,7 +19,7 @@ const quizSchema = new mongoose.Schema({
     {
       questionType: {
         type: String,
-        enum: ["MultiChoice", "CheckBox"],
+        enum: ["MultipleChoice", "CheckBox"],
         required: true,
       },
       question: {

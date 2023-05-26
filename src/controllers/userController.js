@@ -4,31 +4,53 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
 const login = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email })
   if (user == null) {
-    return res.status(400).send("Cannot find user");
+    return res.status(400).send({ message: "Cannot find user" })
   }
   try {
     if (await bcrypt.compare(req.body.password, user.password)) {
-      const accessToken = jwt.sign({ email: req.body.email, id: user._id }, process.env.ACCESS_TOKEN_SECRET)
-      const refreshToken = jwt.sign({ email: req.body.email, id: user._id }, process.env.REFRESH_TOKEN_SECRET)
-      res.json({
-        user: {
-          id: user._id,
-          email: user.email
-        },
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
+      if (user.last_login !== null) {
+        res.status(400).send({ message: "You have login in another device" });
+      }
+      else {
+        user.last_login = Date.now()
+        user.save()
+        const accessToken = jwt.sign({ email: req.body.email, id: user._id }, process.env.ACCESS_TOKEN_SECRET)
+        const refreshToken = jwt.sign({ email: req.body.email, id: user._id }, process.env.REFRESH_TOKEN_SECRET)
+        res.json({
+          user: {
+            id: user._id,
+            email: user.email
+          },
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        })
+      }
     } else {
-      res.send("Not allowed ");
+      res.status(400).send({ message: "Password is not correct" })
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message })
   }
-};
+}
+
+const logout = async (req, res) => {
+  const user = await User.findById(req.body.userId)
+  if (user == null) {
+    return res.status(400).send({ message: "Cannot find user" })
+  }
+  try {
+    user.last_login = null
+    user.save()
+    res.json({ message: "Log out success" })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 
 const register = async (req, res) => {
+
   const {
     email,
     password
@@ -57,4 +79,4 @@ const register = async (req, res) => {
 
 
 
-module.exports = { register, login };
+module.exports = { register, login, logout }
