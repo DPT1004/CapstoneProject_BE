@@ -1,4 +1,5 @@
 const Game = require("../models/gameModel")
+const Quiz = require("../models/quizModel")
 
 const generatePin = async (pin) => {
     var gameExisted = await Game.findOne({ pin: pin, isLive: false })
@@ -17,10 +18,15 @@ const createGame = async (req, res) => {
     })
 
     try {
-        var newPin = await generatePin(pin)
-        game.pin = newPin
-        await game.save()
-        res.status(201).json(game)
+        const existedQuiz = await Quiz.findOne({ _id: quizId, isPublic: true })
+        if (existedQuiz !== null) {
+            var newPin = await generatePin(pin)
+            game.pin = newPin
+            await game.save()
+            res.json(game)
+        } else {
+            res.json({ message: "This Quiz haven't been available so can't create Game with this anymore" })
+        }
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
@@ -34,7 +40,7 @@ const getGame = async (req, res) => {
         }
         res.json(game)
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        res.status(400).json({ message: error.message })
     }
 }
 

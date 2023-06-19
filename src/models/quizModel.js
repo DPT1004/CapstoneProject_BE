@@ -28,10 +28,18 @@ const quizSchema = new mongoose.Schema({
       },
       time: {
         type: Number,
-        min: 5,
-        max: 90,
       },
       backgroundImage: { type: String },
+      video: { type: String },
+      youtube: { type: String },
+      startTime: {
+        type: Number,
+        default: 0
+      },
+      endTime: {
+        type: Number,
+        default: 0
+      },
       answerList: [
         {
           answer: { type: String },
@@ -39,6 +47,14 @@ const quizSchema = new mongoose.Schema({
           img: { type: String }
         },
       ],
+      difficulty: {
+        type: String,
+        enum: ["easy", "normal", "hard"],
+        default: "easy"
+      },
+      category: {
+        type: String,
+      }
     },
   ],
 })

@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   register,
   login,
-  logout
+  logout,
+  loginWithSocial
 } = require("../controllers/userController");
 
 router
@@ -12,6 +13,8 @@ router
   .post(register);
 
 router.post("/login", login)
+
+router.post("/loginWithSocial", loginWithSocial)
 
 router.post("/logout", logout)
 

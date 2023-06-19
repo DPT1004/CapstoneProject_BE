@@ -9,9 +9,6 @@ const {
     getQuizesBySearch,
     updateQuiz,
     deleteQuiz,
-    addQuestion,
-    updateQuestion,
-    deleteQuestion
 } = require("../controllers/quizController")
 
 router
@@ -19,7 +16,7 @@ router
     .post(createQuiz)
     .get(getAllQuiz)
 
-router.get("/search", getQuizesBySearch)
+router.post("/search", getQuizesBySearch)
 
 router
     .route("/:id")
@@ -28,14 +25,5 @@ router
     .delete(deleteQuiz)
 
 router.get("/creator/:creatorId", getQuizByIdCreator)
-
-router
-    .route('/questions/:quizId')
-    .post(addQuestion)
-
-router
-    .route('/questions/:quizId/:questionId')
-    .patch(updateQuestion)
-    .delete(deleteQuestion)
 
 module.exports = router;

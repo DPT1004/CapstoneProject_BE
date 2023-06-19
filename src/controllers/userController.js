@@ -21,7 +21,9 @@ const login = async (req, res) => {
         res.json({
           user: {
             id: user._id,
-            email: user.email
+            email: user.email,
+            name: user.name,
+            photo: user.photo,
           },
           accessToken: accessToken,
           refreshToken: refreshToken,
@@ -49,11 +51,63 @@ const logout = async (req, res) => {
   }
 }
 
+const loginWithSocial = async (req, res) => {
+  const {
+    email,
+    name,
+    photo
+  } = req.body;
+  try {
+    const user = await User.findOne({ email: req.body.email })
+    if (user == null) {
+      const newUser = new User({
+        email: email,
+        name: name,
+        photo: photo,
+        last_login: Date.now()
+      })
+      newUser.save()
+      const accessToken = jwt.sign({ email: req.body.email, id: newUser._id }, process.env.ACCESS_TOKEN_SECRET)
+      const refreshToken = jwt.sign({ email: req.body.email, id: newUser._id }, process.env.REFRESH_TOKEN_SECRET)
+      res.json({
+        user: {
+          id: newUser._id,
+          email: newUser.email,
+          name: newUser.name,
+          photo: newUser.photo,
+        },
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      })
+    } else {
+      user.last_login = Date.now()
+      user.photo = photo
+      await user.save()
+      const accessToken = jwt.sign({ email: req.body.email, id: user._id }, process.env.ACCESS_TOKEN_SECRET)
+      const refreshToken = jwt.sign({ email: req.body.email, id: user._id }, process.env.REFRESH_TOKEN_SECRET)
+      res.json({
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          photo: user.photo,
+        },
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      })
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+
 const register = async (req, res) => {
 
   const {
     email,
-    password
+    password,
+    name
   } = req.body;
 
   const existingEmail = await User.findOne({ email: email });
@@ -63,13 +117,14 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt()
     const hashedPassword = await bcrypt.hash(password, salt)
     const user = new User({
-      email,
+      email: email,
       password: hashedPassword,
+      name: name
     });
     try {
       const newUser = await user.save();
-      res.status(201).json({
-        user: newUser
+      res.json({
+        message: "Register success"
       });
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -79,4 +134,4 @@ const register = async (req, res) => {
 
 
 
-module.exports = { register, login, logout }
+module.exports = { register, login, logout, loginWithSocial }

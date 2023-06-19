@@ -8,7 +8,15 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    // required: true,
+  },
+  name: {
+    type: String,
+    default: ""
+  },
+  photo: {
+    type: String,
+    default: "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
   },
   last_login: {
     type: Date,

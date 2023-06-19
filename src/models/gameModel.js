@@ -24,13 +24,31 @@ const gameSchema = new mongoose.Schema({
             },
             userName: { type: String },
             socketId: { type: String },
+            photo: { type: String },
             totalScore: { type: Number, default: 0 },
-            currentIndexQuestion: { type: Number, default: 0 }
-        },
+            totalTimeAnswer: { type: Number, default: 0 },
+            numberOfCorrect: { type: Number, default: 0 },
+            numberOfInCorrect: { type: Number, default: 0 },
+            currentIndexQuestion: { type: Number, default: 0 },
+            playerResult: [
+                {
+                    question: { type: Object },
+                    indexPlayerAnswer: [Number],
+                    playerAnswer: { type: String, default: null },
+                    score: { type: Number },
+                    timeAnswer: { type: Number }
+                }
+            ]
+        }
+    ],
+    playerWasKicked: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
     ],
     date: {
         type: Date,
-        required: true,
         default: Date.now,
     },
 });
