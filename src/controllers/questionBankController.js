@@ -7,12 +7,12 @@ const getQuestionsBySearch = async (req, res) => {
         var result = []
         if (arrQuestionType.length !== 0) {
             result = await QuestionBank.find({
-                question: { $regex: searchQuery },
+                question: { $regex: searchQuery, $options: "i" },
                 questionType: { $in: arrQuestionType }
             })
         } else {
             result = await QuestionBank.find({
-                question: { $regex: searchQuery }
+                question: { $regex: searchQuery, $options: "i" }
             })
         }
 

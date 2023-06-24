@@ -112,21 +112,21 @@ const getQuizesBySearch = async (req, res) => {
 
       result = await Quiz.find({
         isPublic: true,
-        name: { $regex: searchQuery }
+        name: { $regex: searchQuery, $options: "i" }
       })
         .limit(LIMIT)
         .skip(startIndex)
 
       total = await Quiz.find({
         isPublic: true,
-        name: { $regex: searchQuery }
+        name: { $regex: searchQuery, $options: "i" }
       }).countDocuments()
 
     } else {
 
       result = await Quiz.find({
         isPublic: true,
-        name: { $regex: searchQuery },
+        name: { $regex: searchQuery, $options: "i" },
         categories: { $in: categories }
       })
         .limit(LIMIT)
@@ -134,7 +134,7 @@ const getQuizesBySearch = async (req, res) => {
 
       total = await Quiz.find({
         isPublic: true,
-        name: { $regex: searchQuery },
+        name: { $regex: searchQuery, $options: "i" },
         categories: { $in: categories }
       }).countDocuments()
     }

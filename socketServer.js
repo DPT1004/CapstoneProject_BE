@@ -107,16 +107,11 @@ io.on("connection", (socket) => {
         try {
             var game = await Game.findOne({ pin: pin, isLive: true })
             if (game !== null) {
-                if (game.playerList.length == 1) {
-                    await Game.findOneAndDelete({ pin: pin, isLive: true })
-                }
-                else {
-                    game.playerList.splice(game.playerList.findIndex(player => player.userId == userId), 1)
-                    game.save()
-                    var leaderBoard = game.playerList.sort((a, b) => b.totalScore - a.totalScore)
-                    socket.to(pin).emit("player-quited-when-game-isPlaying", leaderBoard)
-                    socket.leave(pin)
-                }
+                game.playerList.splice(game.playerList.findIndex(player => player.userId == userId), 1)
+                game.save()
+                var leaderBoard = game.playerList.sort((a, b) => b.totalScore - a.totalScore)
+                socket.to(pin).emit("player-quited-when-game-isPlaying", { leaderBoard })
+                socket.leave(pin)
             }
         } catch (error) {
             console.log("player-quit-when-game-isPlaying error", error)
@@ -168,6 +163,10 @@ io.on("connection", (socket) => {
         }
     })
 
+    socket.on("player-quit-room-when-game-finish", async ({ pin }) => {
+        socket.leave(pin)
+    })
+
     socket.on("player-send-score-and-currentIndexQuestion", async ({ userId, pin, scoreRecieve, currentIndexQuestion, playerResult }) => {
         try {
             var game = await Game.findOne({ pin: pin })
@@ -187,9 +186,6 @@ io.on("connection", (socket) => {
                 var leaderBoard = game.playerList.sort((a, b) => b.totalScore - a.totalScore)
 
                 io.in(pin).emit("players-get-finalLeaderBoard", { leaderBoard })
-                if (game.playerList.every(player => player.currentIndexQuestion + 1 == quiz.numberOfQuestions)) {
-                    io.socketsLeave(pin)
-                }
             }
         } catch (error) {
             console.log("player-send-score-and-currentIndexQuestion error", error)

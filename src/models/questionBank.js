@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const questionBankSchema = new mongoose.Schema({
     questionType: {
         type: String,
-        enum: ["MultipleChoice", "CheckBox"],
+        enum: ["MultipleChoice", "CheckBox", "Fill-In-The-Blank"],
         required: true,
     },
     question: {
@@ -14,6 +14,16 @@ const questionBankSchema = new mongoose.Schema({
         type: Number,
     },
     backgroundImage: { type: String },
+    video: { type: String },
+    youtube: { type: String },
+    startTime: {
+        type: Number,
+        default: 0
+    },
+    endTime: {
+        type: Number,
+        default: 0
+    },
     answerList: [
         {
             answer: { type: String },
