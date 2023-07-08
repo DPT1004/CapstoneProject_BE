@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const questionBankSchema = new mongoose.Schema({
     questionType: {
         type: String,
-        enum: ["MultipleChoice", "CheckBox", "Fill-In-The-Blank"],
+        enum: ["MultipleChoice", "CheckBox", "Fill-In-The-Blank", "DragAndSort"],
         required: true,
     },
     question: {
@@ -28,7 +28,8 @@ const questionBankSchema = new mongoose.Schema({
         {
             answer: { type: String },
             isCorrect: { type: Boolean },
-            img: { type: String }
+            img: { type: String },
+            order: { type: Number, default: -1 }
         },
     ],
     difficulty: {

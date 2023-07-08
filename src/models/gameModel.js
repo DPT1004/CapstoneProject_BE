@@ -35,6 +35,7 @@ const gameSchema = new mongoose.Schema({
                     question: { type: Object },
                     indexPlayerAnswer: [Number],
                     playerAnswer: { type: String, default: null },
+                    arrPlayerAnswer: { type: Array, default: null },
                     score: { type: Number },
                     timeAnswer: { type: Number }
                 }

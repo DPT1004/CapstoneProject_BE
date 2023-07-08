@@ -171,7 +171,7 @@ io.on("connection", (socket) => {
         try {
             var game = await Game.findOne({ pin: pin })
             if (game !== null) {
-                var quiz = Quiz.findById(game.quizId)
+
                 var player = game.playerList.find(player => player.userId == userId)
                 player.totalScore += scoreRecieve
                 player.totalTimeAnswer += playerResult.timeAnswer
